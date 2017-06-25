@@ -1,0 +1,103 @@
+html, body {
+  background: url(https://www.getpaint.net/doc/latest/images/layerswindow/checkerboard.png);
+}
+
+#brush {
+  position: absolute;
+  z-index: 9999;
+  transition: 0s;
+  -webkit-user-select: none;
+  pointer-events: none;
+}
+
+#brush:hover {
+  cursor: crosshair;
+}
+
+.grid {
+  outline: 1px solid black;
+  display: flex;
+  flex-wrap: wrap;
+  -webkit-user-select: none;
+}
+
+.cell {
+  display: inline-block;
+  margin: 0;
+  padding: 0;
+  height: 64px;
+  width: 64px;
+  background-size: cover;
+}
+
+.cell.empty {
+  outline: 1px solid black;
+  background: rgba(25, 25, 25, 0.3);
+}
+
+.sidebar {
+  width: 0;
+  position: absolute;
+  display: flex;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  background: #161313;
+  color: ghostwhite;
+  transition: all .3s;
+}
+
+.sidebar.open {
+  width: 300px;
+}
+
+.sidebar .sidebar-content {
+  width: 100%;
+}
+
+.sidebar ul {
+  list-style: none;
+}
+
+.sidebar ul li.active {
+  outline: 1px solid #ff00ff;
+}
+
+.sidebar ul li img {
+  height: 64px;
+}
+
+.sidebar form input {
+  background: transparent;
+  color: #c1c1c1;
+  outline: none;
+  border: none;
+  border-bottom: 1px solid #c1c1c1;
+}
+
+.sidebar form button {
+  box-sizing: border-box;
+  background: transparent;
+  border: 1px solid #c1c1c1;
+  transition: all .3s;
+  color: #fff;
+  margin: 1em;
+  padding: 1em;
+}
+
+.sidebar form button:hover {
+  background: #c1c1c1;
+  color: #fff;
+}
+
+.main-content {
+  margin-left: 0;
+}
+
+.main-content.pushed {
+  margin-left: 300px;
+}
+
+.centered {
+  text-align: center;
+}

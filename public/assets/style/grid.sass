@@ -1,0 +1,79 @@
+$dark: #161313
+$text-color: ghostwhite
+
+html, body
+	background: url(https://www.getpaint.net/doc/latest/images/layerswindow/checkerboard.png)
+
+
+#brush
+	position: absolute
+	z-index: 9999
+	transition: 0s
+	-webkit-user-select: none
+	pointer-events: none
+	&:hover
+		cursor: crosshair
+.grid
+	outline: 1px solid black
+	display: flex
+	flex-wrap: wrap
+	-webkit-user-select: none
+
+.cell
+	display: inline-block
+	margin: 0
+	padding: 0
+	height: 64px
+	width: 64px
+	background-size: cover
+	&.empty
+		outline: 1px solid black
+		background: rgba(25,25,25,.3)
+
+.sidebar
+	width: 0
+	position: absolute
+	display: flex
+	top: 0
+	left: 0
+	bottom: 0
+	background: $dark
+	color: $text-color
+	transition: all .3s
+	&.open
+		width: 300px
+	.sidebar-content
+		width: 100%
+	ul
+		list-style: none
+		li
+			&.active
+				outline: 1px solid #ff00ff
+			img
+				height: 64px
+	form
+		input
+			background: transparent
+			color: #c1c1c1
+			outline: none
+			border: none
+			border-bottom: 1px solid #c1c1c1
+		button
+			box-sizing: border-box
+			background: transparent
+			border: 1px solid #c1c1c1
+			transition: all .3s
+			color: #fff
+			margin: 1em
+			padding: 1em
+			&:hover
+				background: #c1c1c1
+				color: #fff
+					
+.main-content
+	margin-left: 0
+	&.pushed
+		margin-left: 300px
+
+.centered
+	text-align: center

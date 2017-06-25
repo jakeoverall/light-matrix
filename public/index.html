@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Tile Map Maker</title>
+  <link rel="stylesheet" href="assets/style/grid.min.css">
+</head>
+
+<body>
+
+  <div class="dashboard">
+    <div class="sidebar-tool">
+      <i class="glyphicon glyphicon-cog"></i>
+    </div>
+    <div class="sidebar open">
+      <div class="sidebar-content">
+        <h4>Tiles</h4>
+        <ul class="list-group" id="tiles">
+        </ul>
+        <hr>
+        <form class="form" onsubmit="app.controllers.gridCtrl.updateGrid(event)">
+          <fieldset>
+            <legend>Grid Resolution</legend>
+            <div class="form-group">
+              <input placeholder="rows" class="form-control" type="text" name="grid-height">
+            </div>
+            <div class="form-group">
+              <input placeholder="columns" type="text" name="grid-width">
+            </div>
+          </fieldset>
+          <fieldset>
+            <legend>Tile Resolution</legend>
+            <div class="form-group">
+              <input placeholder="height" type="text" name="tile-height">
+            </div>
+            <div class="form-group">
+              <input placeholder="width" type="text" name="tile-width">
+            </div>
+          </fieldset>
+          <fieldset>
+            <legend>Color</legend>
+            <div class="form-group">
+              <input type="color" name="tile-color" value="#ffffff" id="color-picker">
+            </div>
+          </fieldset>
+          <div class="">
+            <button type="submit">Apply</button>
+          </div>
+        </form>
+
+        <div class="frames">
+          <form class="form" onsubmit="app.controllers.gridCtrl.sendFrames(event)">
+            <div id="frames"></div>
+            <fieldset>
+              <legend>Frames</legend>
+              <h4 id="frame-i"></h4>
+              <div class="">
+                <button type="submit">Send Frames</button>
+                <button type="button" onclick="app.controllers.gridCtrl.saveFrame()">Save Frame</button>
+                <button type="button" onclick="app.controllers.gridCtrl.changeFrame(-1)">Prev Frame</button>
+                <button type="button" onclick="app.controllers.gridCtrl.changeFrame(1)">Next Frame</button>
+                <button type="button" onclick="app.controllers.gridCtrl.deleteFrame()">Delete Frame</button>
+                <button type="button" onclick="app.controllers.gridCtrl.newFrame()">New Frame</button>
+              </div>
+            </fieldset>
+            
+          </form>
+        </div>
+
+      </div>
+    </div>
+    <div class="main-content pushed">
+      <div class="container-fluid">
+        <div class="row">
+          <div class="col-sm-12">
+            <div id="brush" style="background-color: #ffffff; height: 32px; width: 32px;"></div>
+            <div id="grid" class="grid">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <script src="jquery.js"></script>
+  <script src="app/services/grid-service.js"></script>
+  <script src="app/controllers/grid-controller.js"></script>
+  <script src="app/init.js"></script>
+
+</body>
+
+</html>
