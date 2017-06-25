@@ -34,6 +34,7 @@ color COLORMATRIX[MATRIXSIZE];
 //Global Byte counter
 uint16_t BYTECOUNT = 0;
 uint16_t COLORINDEX = 0;
+int MODE = 1;
 
 void setup()
 {
@@ -49,59 +50,102 @@ void setup()
   delay(1000);
   Serial.println("Ready");
   
-  if(VERBOSE) Serial.println("Verbose Debug ON");
-  
-  if(TESTMODE)
-  {
-   Serial.println("TestMode ON");
-   while(true)
-   {
-     chaserTest();
-     //randomTest();
-     //fastTest();
-   } 
-  } 
+  if(MODE == 0){
+    Serial.println("Verbose Debug ON");  
+    help();
+  }
 }
 
+void options(int c){
+    switch(c){
+      case 0:
+        chaserTest();
+        break;
+      case 1:
+        randomTest();
+        break;
+      case 2:
+        fastTest();
+        break;
+      case 3:
+        clearColorMatrix();
+        drawColorMatrix();
+        MODE = 1;
+        break;
+      case 4:
+        help();
+        break;
+    }
+}
 
 void loop()
 {
-  if(Serial.available() > 0)
-  {
-    int incomingByte = Serial.read();
-    if(incomingByte < 0 || incomingByte > 255)
-    {
-      Serial.println("Bad data received");
-      return; 
+  if(Serial.available() > 0){
+    int incomingByte = Serial.read() - '0';
+    if(MODE == 0){
+      Serial.print("Recieved Byte: ");
+      Serial.print(incomingByte);
+      Serial.println("");
+      Serial.println("----------");
+      Serial.print("CURRENT MODE: ");
+      Serial.print(MODE);
+      Serial.println("");
+      options(incomingByte);  
+    }else{
+      program(incomingByte);  
     }
-    else
+  }
+}
+
+
+void help(){
+  Serial.println("-----Start Help Menu--------------------");
+  Serial.println("| Select a test by number              |");
+  Serial.println("|                                      |");
+  Serial.println("| 0: Chaser Test                       |");
+  Serial.println("| 1: Random Color Test                 |");
+  Serial.println("| 2: Fast Test                         |");
+  Serial.println("| 3: Start Program                     |");
+  Serial.println("| 4: Show Help                         |");
+  Serial.println("|                                      |");
+  Serial.println("-----End Help Menu----------------------");
+}
+
+
+void program(int incomingByte)
+{
+  if(incomingByte < 0 || incomingByte > 255)
+  {
+    Serial.println("Bad data received");
+    return; 
+  }
+  else
+  {
+    if(incomingByte == 255) {incomingByte = 254;} //No full value to prevent premature display of lights (due to protocol)
+    switch(BYTECOUNT)
     {
-      if(incomingByte = 255) incomingByte = 254; //No full value to prevent premature display of lights (due to protocol)
-      switch(BYTECOUNT)
-      {
-       case 0:
-        COLORMATRIX[COLORINDEX].r =  byte(incomingByte);
-        break;
-        
-       case 1:
-        COLORMATRIX[COLORINDEX].g =  byte(incomingByte);
-        break;
-        
-       case 2:
-        COLORMATRIX[COLORINDEX].b =  byte(incomingByte);
-        break;
-      }
-      BYTECOUNT++;
+     case 0:
+      COLORMATRIX[COLORINDEX].r =  byte(incomingByte);
+      break;
       
-      if(BYTECOUNT >= 3){
-        BYTECOUNT = 0;
-        COLORINDEX++;
-      }
-      if(COLORINDEX > MATRIXSIZE)
-      {
-        COLORINDEX = 0;
-        drawColorMatrix();
-      }
+     case 1:
+      COLORMATRIX[COLORINDEX].g =  byte(incomingByte);
+      break;
+      
+     case 2:
+      COLORMATRIX[COLORINDEX].b =  byte(incomingByte);
+      break;
+    }
+    BYTECOUNT++;
+    
+    if(BYTECOUNT >= 3){
+      BYTECOUNT = 0;
+      COLORINDEX++;
+    }
+    if(COLORINDEX > MATRIXSIZE)
+    {
+      COLORINDEX = 0;
+      drawColorMatrix();
     }
   }
 }
@@ -131,7 +175,7 @@ void clearColorMatrix()
 
 void drawColorMatrix()
 {
-  //if(VERBOSE){ Serial.println("Drawing"); printColorMatrix(); }
+  if(VERBOSE){ Serial.println("Drawing"); printColorMatrix(); }
   shiftMutiple(0x00, 16);
   for(int i = 0; i < MATRIXSIZE; i++)
   {
