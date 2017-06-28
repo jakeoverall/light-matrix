@@ -7,11 +7,6 @@ let express = require('express')
     , port = 3000;
 
 
-let _port = new SerialPort('COM3', {
-    baudRate: 115200
-})
-
-_port.on('open', startApp)
 
 app.use(cors())
 app.use(express.static(__dirname + '/public'))
@@ -30,47 +25,74 @@ app.get('/api/animations/:animName', (req, res, next) => {
     res.send(anim || "Invalid Animation")
 
     if (anim) {
+        anim.frameRate = req.query.framerate || anim.frameRate || 300
+        anim.cycles = req.query.cycles || anim.cycles || 1
         playAnimation(anim)
     }
 
 })
 
-function playAnimation(anim) {
+let _port = new SerialPort('COM3', {
+    baudRate: 115200,
+    parser: SerialPort.parsers.readline('\n')
+})
+
+_port.on('open', startApp)
+_port.on('data', function (d) {
+    console.log("RECIEVED FROM BOARD", d)
+})
+
+function playAnimation(anim, cycle) {
     if (_port.isOpen) {
         console.log("playing ", anim.name)
-        for (var i = 0; i < anim.frames.length; i++) {
-            var frame = anim.frames[i];
-            var m = []
-            for (var j = 0; j < frame.map.length; j++) {
-                var pixels = frame.map[j];
-                pixels.forEach(function (color) {
-                    if (color.length != 7) { color = "#000000" }
-                    color = color.slice(1, color.length)
-                    console.log("color", color)
-                    let r = parseInt(color[0] + color[1], 16) || 0
-                    let g = parseInt(color[2] + color[3], 16) || 0
-                    let b = parseInt(color[4] + color[5], 16) || 0
-                    m.push(r, g, b)
-                    // _port.write(r, log)
-                    // log(null, r)
-                    // _port.write(g, log)
-                    // log(null, g)
-                    // _port.write(b, log)
-                    // log(null, b)
-                });
-                // _port.write(Buffer.from(m), log)
+        playAnimationCycle(anim).then(() => {
+            cycle = cycle + 1 || 1
+            if (cycle < anim.cycles) {
+                playAnimation(anim, cycle)
+            } else {
+                console.log("Animation Finished", anim.name)
             }
-            let buffer = Buffer.from(m)
-            // console.log("Buffer Length:", m)
-            m.forEach(val => {
-                console.log(val)
-                _port.write(val)
-            })
-        }
+        })
     }
 }
+
+function playAnimationCycle(anim) {
+    return Promise.all(anim.frames.map(frame => {
+        return printFrame(frame, anim.frameRate)
+    }))
+}
+
+function printFrame(frame, frameRate) {
+    return new Promise((resolve, reject) => {
+        setTimeout(() => {
+            let buffer = frameToBuffer(frame)
+            _port.write(buffer, log)
+            resolve()
+        }, frameRate)
+    })
+
+}
+
+function frameToBuffer(frame) {
+    var m = []
+    for (var j = 0; j < frame.map.length; j++) {
+        var pixels = frame.map[j];
+        pixels.forEach(function (color) {
+            if (color.length != 7) { color = "#000000" }
+            color = color.slice(1, color.length)
+            console.log("color", color)
+            let r = parseInt(color[0] + color[1], 16) || 0
+            let g = parseInt(color[2] + color[3], 16) || 0
+            let b = parseInt(color[4] + color[5], 16) || 0
+            m.push(r, g, b)
+        });
+    }
+    return Buffer.from(m)
+}
+
 function log(err, val) {
-    console.log("LOG:", val)
+    if (err) console.log("Error Writting to board: ", err)
+    if (val) console.log("Bytes Written:", val)
 }
 
 function startApp() {

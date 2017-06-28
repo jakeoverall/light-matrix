@@ -81,7 +81,7 @@ void options(int c){
 void loop()
 {
   if(Serial.available() > 0){
-    int incomingByte = Serial.read() - '0';
+    int incomingByte = Serial.read();
     if(MODE == 0){
       Serial.print("Recieved Byte: ");
       Serial.print(incomingByte);
@@ -119,34 +119,33 @@ void program(int incomingByte)
     Serial.println("Bad data received");
     return; 
   }
-  else
+  
+  if(incomingByte == 255) {incomingByte = 254;} //No full value to prevent premature display of lights (due to protocol)
+  switch(BYTECOUNT)
   {
-    if(incomingByte == 255) {incomingByte = 254;} //No full value to prevent premature display of lights (due to protocol)
-    switch(BYTECOUNT)
-    {
-     case 0:
-      COLORMATRIX[COLORINDEX].r =  byte(incomingByte);
-      break;
-      
-     case 1:
-      COLORMATRIX[COLORINDEX].g =  byte(incomingByte);
-      break;
-      
-     case 2:
-      COLORMATRIX[COLORINDEX].b =  byte(incomingByte);
-      break;
-    }
-    BYTECOUNT++;
+   case 0:
+    COLORMATRIX[COLORINDEX].r =  byte(incomingByte);
+    break;
     
-    if(BYTECOUNT >= 3){
-      BYTECOUNT = 0;
-      COLORINDEX++;
-    }
-    if(COLORINDEX > MATRIXSIZE)
-    {
-      COLORINDEX = 0;
-      drawColorMatrix();
-    }
+   case 1:
+    COLORMATRIX[COLORINDEX].g =  byte(incomingByte);
+    break;
+    
+   case 2:
+    COLORMATRIX[COLORINDEX].b =  byte(incomingByte);
+    break;
+  }
+  BYTECOUNT++;
+  
+  if(BYTECOUNT >= 3){
+    BYTECOUNT = 0;
+    COLORINDEX++;
+  }
+  if(COLORINDEX >= MATRIXSIZE)
+  {
+    COLORINDEX = 0;
+    drawColorMatrix();
+    clearColorMatrix();
   }
 }
 
@@ -242,6 +241,7 @@ void fastTest()
   }
   clearColorMatrix();
 }
+
 
 
 

@@ -39,7 +39,19 @@ function GridService() {
       name: animation,
       frames: frames
     }
-    $.post('/api/animations', anim)
+
+    anim = JSON.parse(JSON.stringify(anim))
+    anim.frames.forEach(f => {
+      f.map.forEach((row, i) => {
+        if(i % 2 !== 0){
+          row = row.reverse()
+        }
+      })
+    })
+
+    $.post('/api/animations', anim).then(()=>{
+      $.get('/api/animations/'+anim.name)
+    })
   }
 
   this.setGrid = (grid) => {
